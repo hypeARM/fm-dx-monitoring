@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="./css/styles.css" rel="stylesheet" type="text/css">
+        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>FM-DX Monitoring - <%= info.tunerName %></title>
+    </head>
+    <body style="background-image: url('<%= info.bgImage ? info.bgImage : null %>')">
+        <div id="wrapper-outer">
+            <div class="wrapper">
+                <h1 style="text-align: center; margin-top: 25px;font-weight: 100;color: var(--color-main-bright);">FM-DX Monitoring</h1>
+                <h2 style="text-align: center;"><span style="font-weight: 100">Connected to </span> <%= info.tunerName %></h2>
+                <h4 style="text-align: center; font-weight: 100; margin-bottom: 20px;color: var(--color-5)">Powered by FM-DX Webserver</h4>
+
+                <div class="station-panel" style="height: 350px;padding: 20px;">
+                    <canvas id="signal-chart"></canvas>
+                </div>
+                <% data.forEach(frequency => { 
+                    if (frequency.pi && frequency.ps) { %> 
+                        <div class="station-panel">
+                            <div class="station-panel-left">
+                                <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
+                                <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
+                            </div>
+                            <div class="station-panel-center" style="width: 50%;">
+                                <span style="font-size: 14px; color: var(--color-4)">Date: </span> <span style="font-size: 14px;color: var(--color-3)"><%= frequency.date %></span><br>
+                                <span style="color: var(--color-4);font-weight: 700;margin-right: 25px;"><%= (frequency.sig - 11.25).toFixed(0) %> dBμV</span>
+                                <%= frequency.rt0 == "" ? frequency.rt1 : frequency.rt0  %>
+                            </div>
+                            <div class="station-panel-right" style="width: 30%;text-align: center">
+                                <strong style="font-size: 20px;">
+                                    <%- frequency.tp == 1 ? 'TP' : '<span style="opacity:0.3">TP</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <%- frequency.st == 1 ? 'ST' : '<span style="opacity:0.3">ST</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <%= frequency.pty %>
+                                </strong>
+                            </div>
+                            <div class="station-panel-more" style="width: 15%;text-align: center">
+                                <span style="font-size: 56px; color: var(--color-4);">⤸</span>
+                            </div>
+                        </div>
+                    <% } 
+                }) %>
+                
+            </div>
+        </div>
+        <script src="./js/signalchart.js"></script>
+    </body>
+</html>

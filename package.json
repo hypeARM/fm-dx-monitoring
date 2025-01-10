@@ -1,0 +1,19 @@
+{
+  "name": "fm-dx-monitoring",
+  "version": "1.0.0",
+  "description": "This tool allows you to connect to your FM-DX Webserver and show RDS data from the entire band.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FMDX.org",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "puppeteer": "^23.11.1"
+  }
+}
