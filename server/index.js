@@ -5,8 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-const PORT = 3000;
-const webserverLink = "http://192.168.1.15:8080";
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config.json')));
 
 let ipData = null;
 let frequencyData = [];
@@ -44,7 +43,7 @@ try {
 
 async function fetchIPData() {
     try {
-        const response = await axios.get(webserverLink + '/api');
+        const response = await axios.get(config.webserverLink + '/api');
         ipData = response.data;
         const pty = ipData.pty;
         const ptyString = europe_programmes[pty] || 'Unknown';
@@ -78,7 +77,7 @@ setInterval(() => {
         if (err) {
             console.error('Error saving frequency data:', err);
         } else {
-            console.log('[INFO] Frequency data saved successfully.');
+            console.log('[INFO] Data backed up successfully.');
         }
     });
 }, 5 * 60 * 1000);
@@ -87,7 +86,7 @@ async function fetchLocalStorageData() {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     
-    await page.goto(webserverLink);
+    await page.goto(config.webserverLink);
     
     const localStorageData = await page.evaluate(() => {
         let data = {};
@@ -139,6 +138,6 @@ endpoints.get('/data', (req, res) => {
 });
 
 app.use('/', endpoints);
-app.listen(PORT, () => {
-    console.log(`[INFO] Server is running on http://localhost:${PORT}`);
+app.listen(config.monitoringPort, () => {
+    console.log(`[INFO] Server is running on http://localhost:${config.monitoringPort}`);
 });
