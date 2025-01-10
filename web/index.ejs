@@ -17,37 +17,73 @@
                 <h2 style="text-align: center;"><span style="font-weight: 100">Connected to </span> <%= info.tunerName %></h2>
                 <h4 style="text-align: center; font-weight: 100; margin-bottom: 20px;color: var(--color-5)">Powered by FM-DX Webserver</h4>
 
-                <div class="station-panel" style="height: 350px;padding: 20px;">
+                <div class="station-panel chart-panel" style="height: 350px;padding: 20px;margin-bottom: 25px;">
                     <canvas id="signal-chart"></canvas>
                 </div>
+
+                <% 
+                    // Filter the data to only include items with both pi and ps
+                    const filteredData = data.filter(frequency => frequency.pi && frequency.ps);
+                    const count = filteredData.length;
+                %>
+                <h2 style="text-align: center;margin-bottom: 25px;">Station list <span style="font-weight: 100">(<%= count %>)</span></h2>
                 <% data.forEach(frequency => { 
                     if (frequency.pi && frequency.ps) { %> 
-                        <div class="station-panel">
-                            <div class="station-panel-left">
-                                <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
-                                <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
+                        <div class="station-panel-container">
+                            <div class="station-panel">
+                                <div class="station-panel-left">
+                                    <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
+                                    <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
+                                </div>
+                                <div class="station-panel-center" style="width: 50%;">
+                                    <span style="font-size: 14px; color: var(--color-4)">Date: </span> <span style="font-size: 14px;color: var(--color-3)"><%= frequency.date %></span><br>
+                                    <span style="color: var(--color-4);font-weight: 700;margin-right: 25px;"><%= (frequency.sig - 11.25).toFixed(0) %> dBμV</span>
+                                    <%= frequency.rt0 == "" ? frequency.rt1 : frequency.rt0  %>
+                                </div>
+                                <div class="station-panel-right" style="width: 30%;text-align: center">
+                                    <strong style="font-size: 20px;">
+                                        <%- frequency.tp == 1 ? 'TP' : '<span style="opacity:0.3">TP</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <%- frequency.st == 1 ? 'ST' : '<span style="opacity:0.3">ST</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <%= frequency.pty %>
+                                    </strong>
+                                </div>
+                                <div class="station-panel-more" style="width: 15%;text-align: center">
+                                    <img src="./img/arrow.svg" width="64">
+                                </div>
                             </div>
-                            <div class="station-panel-center" style="width: 50%;">
-                                <span style="font-size: 14px; color: var(--color-4)">Date: </span> <span style="font-size: 14px;color: var(--color-3)"><%= frequency.date %></span><br>
-                                <span style="color: var(--color-4);font-weight: 700;margin-right: 25px;"><%= (frequency.sig - 11.25).toFixed(0) %> dBμV</span>
-                                <%= frequency.rt0 == "" ? frequency.rt1 : frequency.rt0  %>
-                            </div>
-                            <div class="station-panel-right" style="width: 30%;text-align: center">
-                                <strong style="font-size: 20px;">
-                                    <%- frequency.tp == 1 ? 'TP' : '<span style="opacity:0.3">TP</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <%- frequency.st == 1 ? 'ST' : '<span style="opacity:0.3">ST</span>' %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <%= frequency.pty %>
-                                </strong>
-                            </div>
-                            <div class="station-panel-more" style="width: 15%;text-align: center">
-                                <span style="font-size: 56px; color: var(--color-4);">⤸</span>
+                            <div class="station-panel-details" style="display: none;">
+                                <div style="display: flex;">
+                                    <div style="width: 75%;">
+                                        <span class="station-panel-ps" style="font-size: 30px;">Station name</span>
+                                        <p style="margin: 0;"><strong>Location, COUNTRY</strong> <span class="text-light">(? km)</span></p>
+                                        <p class="text-heading-light">AF</p>
+                                        <p>
+                                            <% frequency.af.forEach(function(freq, index) { %>
+                                                <%= (freq / 1000).toFixed(1) %><% if (index < frequency.af.length - 1) { %> • <% } %>
+                                            <% }); %>
+                                        </p>
+
+                                        <p class="text-heading-light">RadioText</p>
+                                        <p>
+                                            <%= frequency.rt0 %><br>
+                                            <%= frequency.rt1 %>
+                                        </p>
+                                    </div>
+                                    <div style="text-align: right;width:25%; position: relative;">
+                                        <img src="https://tef.noobish.eu/logos/CZE/<%= frequency.pi %>.png" height="64"><br>
+                                        <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
+                                        <img src="./img/map.png" style="position: absolute; right: 0; bottom: 0;" alt="Show on maps">
+                                    </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     <% } 
-                }) %>
+                }) %>                
                 
             </div>
         </div>
+        <script src="./js/main.js"></script>
         <script src="./js/signalchart.js"></script>
     </body>
 </html>

@@ -44,18 +44,55 @@ body {
     margin: auto;
 }
 
-h2, h4 {
+h2, h4, p {
     margin: 0;
+}
+
+.text-light {
+    font-weight: 300;
+}
+
+.text-heading-light {
+    font-size: 24px;
+    font-weight: 300;
+    margin-top: 10px;
+    color: var(--color-4);
+}
+
+.station-panel-container {
+    margin-bottom: 10px;
 }
 
 .station-panel {
     background-color: var(--color-1-transparent);
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
     border-radius: 15px;
     padding: 15px 0;
     backdrop-filter: blur(5px);
+}
+
+.station-panel-container.active > .station-panel {
+    border-radius: 15px 15px 0 0;
+    background-color: var(--color-2-transparent);
+}
+
+.station-panel-container .station-panel-more img {
+    transition: transform 0.3s ease; /* Smooth rotation */
+}
+
+.station-panel-container.active .station-panel-more img {
+    transform: rotate(180deg);
+}
+
+
+.station-panel:not(.chart-panel) {
+    transition: 0.35s ease background-color;
+    cursor: pointer;
+}
+
+.station-panel:not(.chart-panel):hover {
+    background-color: var(--color-2-transparent);
 }
 
 .station-panel-left {
@@ -69,6 +106,15 @@ h2, h4 {
     font-weight: 700;
     color: var(--color-main-bright);
 }
+
+.station-panel-details {
+    background-color: var(--color-1-transparent);
+    padding: 15px 30px;
+    border-radius: 0 0 15px 15px;
+    border: 3px solid var(--color-2-transparent);
+    border-top: none;
+}
+
 
 @media (max-width: 1280px) {
     .wrapper {

@@ -56,12 +56,12 @@ fetch('./data')
     type: 'line',
     data: {
       datasets: [{
-        label: 'Signal Strength (dBf)',
+        label: 'Signal Strength (dBuV)',
         data: pointData,
         fill: true,
         backgroundColor: 'rgba(88, 219, 171, 0.05)',
         borderColor: 'rgb(88, 219, 171)',
-        tension: 0.3,
+        tension: 0.15,
         pointRadius: function(context) {
           const dataPoint = context.raw;
           return (dataPoint.y === 0 || (!dataPoint.ps || !dataPoint.pi)) ? 0 : 5;
@@ -96,7 +96,7 @@ fetch('./data')
               const ps = dataPoint.ps || 'N/A';
               const pi = dataPoint.pi || 'N/A';
               const freq = dataPoint.x.toFixed(1);  // Format the frequency value (x value) with one decimal point
-              return `${dataPoint.y.toFixed(0)} dBf • ${ps} • ${pi} • ${freq} MHz`;
+              return `${dataPoint.y.toFixed(0)} dBf • ${ps} • ${pi}`;
             }
           }
         },

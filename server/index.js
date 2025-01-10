@@ -5,6 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
+const PORT = 3000;
 const webserverLink = "http://192.168.1.15:8080";
 
 let ipData = null;
@@ -138,8 +139,6 @@ endpoints.get('/data', (req, res) => {
 });
 
 app.use('/', endpoints);
-
-const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`[INFO] Server is running on http://localhost:${PORT}`);
 });
