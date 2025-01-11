@@ -80,7 +80,7 @@
                                 <div style="display: flex;">
                                     <div style="width: 75%;">
                                         <span class="station-panel-ps" style="font-size: 30px;"><%= frequency.txInfo?.tx %></span>
-                                        <p style="margin: 0;"><strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', '' : '' %> <%= frequency.txInfo?.itu %></strong> <span class="text-light">(<%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km)</span></p>
+                                        <p style="margin: 0;"><strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', ' : '' %> <%= frequency.txInfo?.itu %></strong> <span class="text-light">(<%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km)</span></p>
                                         <p class="text-heading-light">AF</p>
                                         <p>
                                             <% frequency.af.sort(function(a, b) { return a - b; }).forEach(function(freq, index) { %>
