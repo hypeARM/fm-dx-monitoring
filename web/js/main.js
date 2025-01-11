@@ -1,5 +1,6 @@
 $(document).ready(function() {
     initPanels();
+    checkImageFormat();
     // Function to fetch and generate the chart based on active antenna
     function fetchAndGenerateChart(activeAnt = 0) {
         fetch('./data')
@@ -173,6 +174,28 @@ $(document).ready(function() {
     }
 });
 
+
+function checkImageFormat() {
+    $(".frequency-logo").each(function() {
+        var $img = $(this);
+        var imgSrc = $img.data('src');  // Get the PNG URL stored in the data-src attribute
+
+        // Try to load the PNG image first
+        $.ajax({
+            url: imgSrc,
+            type: 'HEAD', // Only check the headers, no need to download the full image
+            success: function() {
+                // PNG is available, set it as the source
+                $img.attr('src', imgSrc);
+            },
+            error: function() {
+                // PNG is not available, so use SVG instead
+                var svgSrc = imgSrc.replace('.png', '.svg');
+                $img.attr('src', svgSrc); // Update to SVG
+            }
+        });
+    });
+}
 
 function initPanels() {
     $('.station-panel-container').each(function() {
