@@ -63,7 +63,7 @@ h2, h4, p {
     margin-bottom: 10px;
 }
 
-.station-panel {
+.station-panel, .chart-panel {
     background-color: var(--color-1-transparent);
     display: flex;
     align-items: center;
@@ -115,6 +115,25 @@ h2, h4, p {
     border-top: none;
 }
 
+.antenna-button {
+    width: 100%;
+    border-bottom: 2px solid var(--color-1);
+    display: flex;
+    padding: 15px;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-1-transparent);
+    transition: 0.3s ease background-color;
+    cursor: pointer;
+}
+
+.antenna-button:hover {
+    background-color: var(--color-2-transparent);
+}
+
+.antenna-button.active {
+    background-color: var(--color-2-transparent);
+}
 
 @media (max-width: 1280px) {
     .wrapper {

@@ -2,6 +2,11 @@
 <html>
     <head>
         <link href="./css/styles.css" rel="stylesheet" type="text/css">
+        <script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+  
         <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
@@ -17,8 +22,28 @@
                 <h2 style="text-align: center;"><span style="font-weight: 100">Connected to </span> <%= info.tunerName %></h2>
                 <h4 style="text-align: center; font-weight: 100; margin-bottom: 20px;color: var(--color-5)">Powered by FM-DX Webserver</h4>
 
-                <div class="station-panel chart-panel" style="height: 350px;padding: 20px;margin-bottom: 25px;">
-                    <canvas id="signal-chart"></canvas>
+                <div class="chart-panel" style="margin-bottom: 25px;display: block;padding: 0;">
+
+                    <% if (info.ant.enabled) { %>
+                        <div style="display: flex; text-align: center; border-radius: 15px 15px 0 0; overflow: hidden;">
+                            <% if (info.ant.ant1.enabled) { %>
+                                <div class="antenna-button active" id="ant-0"><%= info.ant.ant1.name %></div>
+                            <% } %>
+                            <% if (info.ant.ant2.enabled) { %>
+                                <div class="antenna-button" id="ant-1"><%= info.ant.ant2.name %></div>
+                            <% } %>
+                            <% if (info.ant.ant3.enabled) { %>
+                                <div class="antenna-button" id="ant-2"><%= info.ant.ant3.name %></div>
+                            <% } %>
+                            <% if (info.ant.ant4.enabled) { %>
+                                <div class="antenna-button" id="ant-3"><%= info.ant.ant4.name %></div>
+                            <% } %>
+                        </div>
+                    <% } %>                    
+ 
+                    <div class="signal-chart-container" style="height: 350px;padding: 20px;">
+                        <canvas id="signal-chart"></canvas>
+                    </div>
                 </div>
 
                 <% 
@@ -26,10 +51,10 @@
                     const filteredData = data.filter(frequency => frequency.pi && frequency.ps);
                     const count = filteredData.length;
                 %>
-                <h2 style="text-align: center;margin-bottom: 25px;">Station list <span style="font-weight: 100">(<%= count %>)</span></h2>
+                <h2 style="text-align: center;margin-bottom: 25px;">Station list <span style="font-weight: 100"></span></h2>
                 <% data.forEach(frequency => { 
                     if (frequency.pi && frequency.ps) { %> 
-                        <div class="station-panel-container">
+                        <div class="station-panel-container" data-ant="<%= frequency.ant ? frequency.ant : 0 %>">
                             <div class="station-panel">
                                 <div class="station-panel-left">
                                     <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
@@ -54,11 +79,11 @@
                             <div class="station-panel-details" style="display: none;">
                                 <div style="display: flex;">
                                     <div style="width: 75%;">
-                                        <span class="station-panel-ps" style="font-size: 30px;">Station name</span>
-                                        <p style="margin: 0;"><strong>Location, COUNTRY</strong> <span class="text-light">(? km)</span></p>
+                                        <span class="station-panel-ps" style="font-size: 30px;"><%= frequency.txInfo?.tx %></span>
+                                        <p style="margin: 0;"><strong><%= frequency.txInfo?.city %>, <%= frequency.txInfo?.itu %></strong> <span class="text-light">(<%= frequency.txInfo?.dist %> km)</span></p>
                                         <p class="text-heading-light">AF</p>
                                         <p>
-                                            <% frequency.af.forEach(function(freq, index) { %>
+                                            <% frequency.af.sort(function(a, b) { return a - b; }).forEach(function(freq, index) { %>
                                                 <%= (freq / 1000).toFixed(1) %><% if (index < frequency.af.length - 1) { %> • <% } %>
                                             <% }); %>
                                         </p>
@@ -70,7 +95,7 @@
                                         </p>
                                     </div>
                                     <div style="text-align: right;width:25%; position: relative;">
-                                        <img src="https://tef.noobish.eu/logos/CZE/<%= frequency.pi %>.png" height="64"><br>
+                                        <img src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" height="64"><br>
                                         <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
                                         <img src="./img/map.png" style="position: absolute; right: 0; bottom: 0;" alt="Show on maps">
                                     </a>
@@ -84,6 +109,5 @@
             </div>
         </div>
         <script src="./js/main.js"></script>
-        <script src="./js/signalchart.js"></script>
     </body>
 </html>

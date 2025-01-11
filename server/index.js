@@ -1,5 +1,4 @@
 const axios = require('axios');
-const puppeteer = require('puppeteer');
 const path = require('path');
 const express = require('express');
 const fs = require('fs');
@@ -28,8 +27,7 @@ console.log(`
     \x1b[33m|  |(_)[ )| | (_)[  |[ )(_]
     \x1b[35m                        ._|
     \x1b[0mby Noobish @ FMDX.org
-    `);
-    
+`);
 
 try {
     if (fs.existsSync(dataFilePath)) {
@@ -83,46 +81,15 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 async function fetchLocalStorageData() {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    
-    await page.goto(config.webserverLink);
-    
-    const localStorageData = await page.evaluate(() => {
-        let data = {};
-        
-        for (let key in localStorage) {
-            data[key] = localStorage.getItem(key);
-        }
-        
-        const tunerNameElement = document.querySelector('#tuner-name');
-        let tunerName = tunerNameElement ? tunerNameElement.textContent : null;
-        
-        if (tunerName) {
-            tunerName = tunerName.trim();
-            const outerBracketsRemoved = tunerName.replace(/^\[(.*)\]$/, '$1').trim();
-            tunerName = outerBracketsRemoved;
-        }
-        data['tunerName'] = tunerName;
-        delete data['sd0'];
-        delete data['sd1'];
-        delete data['sd'];
-        delete data['ad'];
-        
-        return data;
-    });
-    
-    //console.log('LocalStorage data:', localStorageData);
-    
-    await browser.close();
-    return localStorageData;
+    try {
+        const response = await axios.get(config.webserverLink + '/static_data');
+        localStorageInfo = response.data;
+    } catch (error) {
+        console.error('Error fetching local storage data:', error);
+    }
 }
 
-fetchLocalStorageData().then(data => {
-    localStorageInfo = data;
-}).catch(error => {
-    console.error('Error fetching localStorage data:', error);
-});
+fetchLocalStorageData();
 
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, '../web')));
