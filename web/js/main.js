@@ -94,6 +94,13 @@ $(document).ready(function() {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        transitions: {
+                            zoom: {
+                                animation: {
+                                    duration: 0
+                                },
+                            },
+                        },
                         plugins: {
                             legend: {
                                 display: false
@@ -117,6 +124,27 @@ $(document).ready(function() {
                                 annotations: annotations,
                                 animation: false
                             },
+                            zoom: {
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x', 
+                                    speed: 10,
+                                    threshold: 10
+                                },
+                                limits:{
+                                    x: {min: 87.3, max: 108.2},
+                                },
+                                zoom: {
+                                    enabled: true,
+                                    mode: 'x',
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                }
+                            }
                         },
                         scales: {
                             x: {
