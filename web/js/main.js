@@ -61,7 +61,7 @@ $(document).ready(function() {
 
                     return {
                         x: freq,
-                        y: sigValuesWithZeros[index],
+                        y: sigValuesWithZeros[index] - 11.25,
                         ps: ps,
                         pi: pi,
                     };
@@ -78,7 +78,7 @@ $(document).ready(function() {
                         datasets: [{
                             label: 'Signal Strength (dBuV)',
                             data: pointData,
-                            fill: true,
+                            fill: false,
                             backgroundColor: 'rgba(88, 219, 171, 0.05)',
                             borderColor: 'rgb(88, 219, 171)',
                             tension: 0.15,
@@ -109,7 +109,7 @@ $(document).ready(function() {
                                         const ps = dataPoint.ps || 'N/A';
                                         const pi = dataPoint.pi || 'N/A';
                                         const freq = dataPoint.x.toFixed(1);
-                                        return `${dataPoint.y.toFixed(0)} dBf • ${ps} • ${pi}`;
+                                        return `${(dataPoint.y - 11.25).toFixed(0)} dBμV • ${ps} • ${pi}`;
                                     }
                                 }
                             },
@@ -136,11 +136,11 @@ $(document).ready(function() {
                                 }
                             },
                             y: {
-                                min: 0,
+                                min: -13,
                                 max: 130,
                                 title: {
                                     display: true,
-                                    text: 'Signal Strength (dBf)'
+                                    text: 'Signal Strength (dBμV)'
                                 }
                             }
                         }

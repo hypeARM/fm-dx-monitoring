@@ -42,28 +42,40 @@ try {
 async function fetchIPData() {
     try {
         const response = await axios.get(config.webserverLink + '/api');
-        ipData = response.data;
+        const ipData = response.data;
         const pty = ipData.pty;
         const ptyString = europe_programmes[pty] || 'Unknown';
-        
         const currentDate = new Date().toISOString();
-        
-        if (ipData.rds !== true && ipData.ps === "") {
-            const roundedFreq = parseFloat(ipData.freq).toFixed(1);
-            frequencyData.push({ freq: roundedFreq, sig: ipData.sig, pty: ptyString, date: currentDate });
-            return;
-        }
-        
         const roundedFreq = parseFloat(ipData.freq).toFixed(1);
-        const existingFreqIndex = frequencyData.findIndex(item => item.freq === roundedFreq);
-        
-        if (existingFreqIndex !== -1) {
-            frequencyData[existingFreqIndex] = { ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate };
+        const ant = ipData.ant || 0; // Default `ant` to 0 if not provided
+
+        // Handle the case where the antenna is 0
+        if (ant === 0) {
+            // Overwrite any dataset with the same frequency but without `ant`
+            const existingFreqIndex = frequencyData.findIndex(item => item.freq === roundedFreq && !item.ant);
+
+            if (existingFreqIndex !== -1) {
+                frequencyData[existingFreqIndex] = { ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant };
+            } else {
+                // No matching entry, push the new data
+                frequencyData.push({ ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant });
+            }
         } else {
-            frequencyData.push({ ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate });
+            // Handle case where `ant` is non-zero: Allow multiple `ant` values for the same frequency
+            const existingFreqIndex = frequencyData.findIndex(item => item.freq === roundedFreq && item.ant === ant);
+
+            if (existingFreqIndex !== -1) {
+                // Update existing entry for the same `ant`
+                frequencyData[existingFreqIndex] = { ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant };
+            } else {
+                // No matching entry, add a new entry for this `ant`
+                frequencyData.push({ ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant });
+            }
         }
-        
+
+        // Sort frequencyData by frequency
         frequencyData.sort((a, b) => parseFloat(a.freq) - parseFloat(b.freq));
+
     } catch (error) {
         console.error('Error fetching IP data:', error);
     }
