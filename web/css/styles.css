@@ -77,23 +77,33 @@ h2, h4, p {
     background-color: var(--color-2-transparent);
 }
 
-.station-panel-container .station-panel-more img {
+.station-panel-container .station-panel-more img, .chart-panel-more img {
     transition: transform 0.3s ease; /* Smooth rotation */
 }
 
-.station-panel-container.active .station-panel-more img {
+.station-panel-container.active .station-panel-more img, .chart-panel-more.active img {
     transform: rotate(180deg);
 }
 
 
-.station-panel:not(.chart-panel) {
+.station-panel:not(.chart-panel), .chart-panel-more {
     transition: 0.35s ease background-color;
     cursor: pointer;
 }
 
-.station-panel:not(.chart-panel):hover {
+.station-panel:not(.chart-panel):hover, .chart-panel-more:hover, .chart-panel-more.active {
     background-color: var(--color-2-transparent);
 }
+
+.chart-panel-more {
+    border-radius: 0 0 15px 15px;
+    user-select: none;
+}
+
+.chart-panel-more.active {
+    border-radius: 0;
+}
+
 
 .station-panel-left {
     text-align: center;
