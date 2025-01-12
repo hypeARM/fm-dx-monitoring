@@ -90,7 +90,7 @@ function prepareItuChart(filteredData) {
 
     // Iterate over each item in the filteredData array
     filteredData.forEach(item => {
-        const ituData = item.txInfo.itu; // Assuming each item has a txInfo object with itu data
+        const ituData = item.txInfo?.itu; // Assuming each item has a txInfo object with itu data
 
         // Aggregate the ituData values
         if (ituData) {
@@ -241,7 +241,7 @@ function preparePolChart(filteredData) {
 
     // Iterate over each item in the filteredData array
     filteredData.forEach(item => {
-        const polData = item.txInfo && item.txInfo.pol;
+        const polData = item.txInfo && item.txInfo?.pol;
 
         if (polData && item.rds === true) {
             if (polMap.has(polData)) {
