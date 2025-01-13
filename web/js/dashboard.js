@@ -9,6 +9,25 @@ country donut chart - ok
 
 var antValue;
 let cachedData = null; // Variable to store the fetched data
+var colorsListBorder = [
+    'rgb(88, 219, 171)',
+    'rgb(203, 202, 165)',
+    'rgb(169, 255, 112)',
+    'rgb(104, 247, 238)',
+    'rgb(245, 182, 66)',
+    'rgb(250, 82, 141)',
+    'rgb(128, 105, 250)',
+]
+
+var colorsListBg = [
+    'rgba(88, 219, 171, 0.4)',
+    'rgba(203, 202, 165, 0.4)',
+    'rgba(169, 255, 112, 0.4)',
+    'rgba(104, 247, 238, 0.4)',
+    'rgba(245, 182, 66, 0.4)',
+    'rgba(250, 82, 141, 0.4)',
+    'rgba(128, 105, 250, 0.4)',
+]
 
 // Fetch the data once and store it in cachedData
 function fetchData() {
@@ -77,8 +96,6 @@ function preparePanelData(filteredData) {
     }
 }
 
-
-
 function prepareItuChart(filteredData) {
     const ctx = document.getElementById('ituDonutChart').getContext('2d');
     if (window.ituChart) {
@@ -90,11 +107,9 @@ function prepareItuChart(filteredData) {
 
     // Iterate over each item in the filteredData array
     filteredData.forEach(item => {
-        const ituData = item.txInfo?.itu; // Assuming each item has a txInfo object with itu data
+        const ituData = item.txInfo?.itu;
 
-        // Aggregate the ituData values
         if (ituData) {
-            // Count occurrences of each itu country code
             if (ituMap.has(ituData)) {
                 ituMap.set(ituData, ituMap.get(ituData) + 1);
             } else {
@@ -105,8 +120,8 @@ function prepareItuChart(filteredData) {
 
     // Prepare chartData from the aggregated map
     const chartData = {
-        labels: Array.from(ituMap.keys()), // Extract unique itu country codes
-        data: Array.from(ituMap.values())  // Extract count of occurrences
+        labels: Array.from(ituMap.keys()),
+        data: Array.from(ituMap.values())
     };
 
     // Create the doughnut chart
@@ -117,30 +132,18 @@ function prepareItuChart(filteredData) {
             datasets: [{
                 label: 'ITU Distribution',
                 data: chartData.data,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(255, 206, 86, 0.4)',
-                    'rgba(75, 192, 192, 0.4)',
-                    'rgba(153, 102, 255, 0.4)',
-                    'rgba(255, 159, 64, 0.4)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
+                backgroundColor: colorsListBg,
+                borderColor: colorsListBorder,
                 borderWidth: 3
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,  // Ensures fixed aspect ratio
+            aspectRatio: 1,  // Keeps the doughnut circular
             plugins: {
                 legend: {
-                    position: 'top',
+                    display: false,  // Hide default legend inside the chart
                 },
                 title: {
                     display: false,
@@ -149,7 +152,24 @@ function prepareItuChart(filteredData) {
             }
         }
     });
+
+    const legendHtml = chartData.labels.map((label, index) => {
+        const backgroundColor = colorsListBg[index % colorsListBg.length]; 
+        const borderColor = colorsListBorder[index % colorsListBorder.length];
+        const value = chartData.data[index];
+        return `
+            <div style="display: flex; align-items: center;margin: 5px;">
+                <span style="width: 12px; height: 12px; background-color: ${backgroundColor}; border: 2px solid ${borderColor}; margin-right: 8px;"></span>
+                <span>${label} <span style="opacity: 0.7">(${value})</span></span>
+            </div>
+        `;
+    }).join('');
+    
+
+    // Insert the generated legend HTML into the separate div
+    document.getElementById('ituLegend').innerHTML = legendHtml;
 }
+
 
 function preparePtyChart(filteredData) {
     const ctx = document.getElementById('ptyDonutChart').getContext('2d');
@@ -186,22 +206,8 @@ function preparePtyChart(filteredData) {
             datasets: [{
                 label: 'pty Distribution',
                 data: chartData.data,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(255, 206, 86, 0.4)',
-                    'rgba(75, 192, 192, 0.4)',
-                    'rgba(153, 102, 255, 0.4)',
-                    'rgba(255, 159, 64, 0.4)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
+                backgroundColor: colorsListBg,
+                borderColor: colorsListBorder,
                 borderWidth: 3
             }]
         },
@@ -209,7 +215,7 @@ function preparePtyChart(filteredData) {
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'top',
+                    display: false,
                 },
                 title: {
                     display: false,
@@ -218,6 +224,22 @@ function preparePtyChart(filteredData) {
             }
         }
     });
+
+    const legendHtml = chartData.labels.map((label, index) => {
+        // Use modulo operator to cycle through color arrays
+        const backgroundColor = colorsListBg[index % colorsListBg.length]; 
+        const borderColor = colorsListBorder[index % colorsListBorder.length];
+        const value = chartData.data[index]; // Get the data value for the label
+        return `
+            <div style="display: flex; align-items: center;margin: 5px;">
+                <span style="width: 12px; height: 12px; background-color: ${backgroundColor}; border: 2px solid ${borderColor}; margin-right: 8px;"></span>
+                <span>${label} <span style="opacity: 0.7">(${value})</span></span>
+            </div>
+        `;
+    }).join('');    
+
+    // Insert the generated legend HTML into the separate div
+    document.getElementById('ptyLegend').innerHTML = legendHtml;
 }
 
 function preparePolChart(filteredData) {
@@ -250,22 +272,20 @@ function preparePolChart(filteredData) {
         }
     });
 
-    // Prepare chartData with values for each polarity type
     const chartData = {
-        labels: [''], // Single label for the bar
+        labels: [''],
         datasets: polTypes.map((type, index) => {
             const count = polMap.get(type);
             return {
-                label: getFullLabel(type),  // Use the full label here
-                data: [count], // Raw count of each polarity type
-                backgroundColor: getColorByType(type, 0.4),  // Background with opacity of 0.4
-                borderColor: getColorByType(type, 1),  // Border with opacity of 1
+                label: getFullLabel(type),
+                data: [count],
+                backgroundColor: colorsListBg[index],
+                borderColor: colorsListBorder[index],
                 borderWidth: 3
             };
         })
-    };
+    };    
 
-    // Create the horizontal stacked bar chart
     window.polChart = new Chart(ctx, {
         type: 'bar',
         data: chartData,
@@ -294,38 +314,6 @@ function preparePolChart(filteredData) {
     });
 }
 
-function getColorByType(type, opacity) {
-    // Define CSS variable names for each polarity type
-    let colorVar = '';
-    let transparentColorVar = '';
-
-    switch(type) {
-        case 'V': 
-            colorVar = '--color-2';
-            transparentColorVar = '--color-2-transparent';
-            break; // Vertical
-        case 'H': 
-            colorVar = '--color-3';
-            transparentColorVar = '--color-3-transparent';
-            break; // Horizontal
-        case 'M': 
-            colorVar = '--color-4';
-            transparentColorVar = '--color-4-transparent';
-            break; // Mixed
-        case 'C': 
-            colorVar = '--color-5';
-            transparentColorVar = '--color-5-transparent';
-            break; // Circular
-    }
-
-    // Get the color from CSS variable
-    const color = getCSSVarValue(colorVar);
-    const transparentColor = getCSSVarValue(transparentColorVar);
-
-    // Return the appropriate color based on opacity
-    return opacity === 1 ? color : transparentColor;
-}
-
 // Function to map short strings to full labels
 function getFullLabel(type) {
     switch(type) {
@@ -337,18 +325,7 @@ function getFullLabel(type) {
     }
 }
 
-function getCSSVarValue(varName) {
-    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+function rgbToRgba(rgb, opacity) {
+    let rgbValues = rgb.match(/\d+/g); // Extract the numeric values
+    return `rgba(${rgbValues[0]}, ${rgbValues[1]}, ${rgbValues[2]}, ${opacity})`;
 }
-
-// Get the color values from the CSS variables
-const color1 = getCSSVarValue('--color-1');
-const color1Transparent = getCSSVarValue('--color-1-transparent');
-const color2 = getCSSVarValue('--color-2');
-const color2Transparent = getCSSVarValue('--color-2-transparent');
-const color3 = getCSSVarValue('--color-3');
-const color3Transparent = getCSSVarValue('--color-3-transparent');
-const color4 = getCSSVarValue('--color-4');
-const color4Transparent = getCSSVarValue('--color-4-transparent');
-const color5 = getCSSVarValue('--color-5');
-const color5Transparent = getCSSVarValue('--color-5-transparent');

@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --color-main: rgb(32, 34, 40);
     --color-main-bright: rgb(88, 219, 171);
@@ -85,7 +89,6 @@ h2, h4, p {
     transform: rotate(180deg);
 }
 
-
 .station-panel:not(.chart-panel), .chart-panel-more {
     transition: 0.35s ease background-color;
     cursor: pointer;
@@ -103,7 +106,6 @@ h2, h4, p {
 .chart-panel-more.active {
     border-radius: 0;
 }
-
 
 .station-panel-left {
     text-align: center;
@@ -145,6 +147,32 @@ h2, h4, p {
     background-color: var(--color-2-transparent);
 }
 
+.flex-container {
+    display: flex;
+}
+
+.chiplet {
+    background-color: var(--color-2-transparent);
+    border-radius: 15px;
+    padding: 10px;
+    width: 33%;
+    text-align: center;
+    margin: 5px;
+}
+
+.panel-50 {
+    width: 50%;
+}
+
+.panel-75 {
+    width: 75%;
+}
+
+.panel-25 {
+    width: 25%;
+    text-align: right;
+}
+
 @media (max-width: 1280px) {
     .wrapper {
         width: 95%;
@@ -170,3 +198,22 @@ h2, h4, p {
     }
   }
   
+  @media (max-width: 768px) {
+    .flex-container {
+        flex-direction: column;
+    }
+    .chiplet {
+        width: 100%;
+    }
+    .panel-50, .panel-75, .panel-25 {
+        width: 100%;
+    }
+
+    .panel-25 {
+        text-align: left;
+    }
+
+    .station-panel {
+        padding: 10px;
+    }
+  }

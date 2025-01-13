@@ -6,9 +6,9 @@ const app = express();
 
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config.json')));
 
-let ipData = null;
 let frequencyData = [];
 let localStorageInfo = [];
+var isRunning = false;
 const dataFilePath = path.join(__dirname, 'frequencyData.json');
 
 const europe_programmes = [
@@ -51,35 +51,42 @@ async function fetchIPData() {
 
         // Handle the case where the antenna is 0
         if (ant === 0) {
-            // Overwrite any dataset with the same frequency but without `ant`
             const existingFreqIndex = frequencyData.findIndex(item => item.freq === roundedFreq && !item.ant);
 
             if (existingFreqIndex !== -1) {
                 frequencyData[existingFreqIndex] = { ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant };
             } else {
-                // No matching entry, push the new data
                 frequencyData.push({ ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant });
             }
         } else {
-            // Handle case where `ant` is non-zero: Allow multiple `ant` values for the same frequency
             const existingFreqIndex = frequencyData.findIndex(item => item.freq === roundedFreq && item.ant === ant);
 
             if (existingFreqIndex !== -1) {
-                // Update existing entry for the same `ant`
                 frequencyData[existingFreqIndex] = { ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant };
             } else {
-                // No matching entry, add a new entry for this `ant`
                 frequencyData.push({ ...ipData, freq: roundedFreq, pty: ptyString, date: currentDate, ant });
             }
         }
+
+        // Remove keys starting with 'ad' or 'sd' (because of the spectrum analyzer)
+        frequencyData = frequencyData.map(entry => {
+            return Object.fromEntries(
+                Object.entries(entry).filter(([key]) => !/^ad|^sd/.test(key))
+            );
+        });
 
         // Sort frequencyData by frequency
         frequencyData.sort((a, b) => parseFloat(a.freq) - parseFloat(b.freq));
 
     } catch (error) {
-        console.error('Error fetching IP data:', error);
+        if (error.code === 'ECONNRESET' || error.code === "ETIMEDOUT") {
+            console.error('[WARN] Connection reset error: Could not reach the API');
+        } else {
+            console.error('Error fetching IP data:', error);
+        }
     }
 }
+
 
 setInterval(fetchIPData, 5000);
 setInterval(() => {
@@ -94,12 +101,20 @@ setInterval(() => {
 
 async function fetchLocalStorageData() {
     try {
-        const response = await axios.get(config.webserverLink + '/static_data');
+        const response = await axios.get(config.webserverLink + '/static_data', {
+            timeout: 2000
+        });
         localStorageInfo = response.data;
+        isRunning = true;
     } catch (error) {
-        console.error('Error fetching local storage data:', error);
+        if (error.code === 'ECONNRESET' || error.code === "ETIMEDOUT" || error.code === "ECONNABORTED") {
+            console.error('[ERROR] Connection reset error: Could not reach the API');
+        } else {
+            console.error('Error fetching IP data:', error);
+        }
     }
 }
+
 
 fetchLocalStorageData();
 
@@ -109,7 +124,11 @@ app.set('views', path.join(__dirname, '../web'));
 
 const endpoints = express.Router();
 endpoints.get('/', (req, res) => {
-    res.render('index', { data: frequencyData, info: localStorageInfo });
+    if(isRunning === true) {
+        res.render('index', { data: frequencyData, info: localStorageInfo });
+    } else {
+        res.send("API connection unsuccessful. Check your configuration.")
+    }
 });
 
 endpoints.get('/data', (req, res) => {

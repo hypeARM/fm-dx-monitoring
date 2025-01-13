@@ -51,35 +51,37 @@
                         <div style="width: 100%;text-align: center;">
                             <h2 style="font-weight: 300; color: var(--color-main-bright);font-size: 38px;">Statistics</h2>
                         </div>
-                        <div style="display: flex;">
-                            <div style="background-color: var(--color-2-transparent); border-radius: 15px;padding: 10px;width: 33%;text-align: center;margin: 5px;">
+                        <div class="flex-container">
+                            <div class="chiplet">
                                 <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Total stations</h2>
                                     <p style="font-size: 28px;font-weight: 300;" id="total-stations"></p>
                             </div>
-                            <div style="background-color: var(--color-2-transparent); border-radius: 15px;padding: 10px;width: 33%;text-align: center;margin:5px;">
+                            <div class="chiplet">
                                 <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Most distant transmitter</h2>
                                     <p style="font-size: 28px;font-weight: 300;" id="distant-station"></p>
                                     <p id="distant-station-details"></p>
                             </div>
-                            <div style="background-color: var(--color-2-transparent); border-radius: 15px;padding: 10px;width: 33%;text-align: center;margin:5px;">
+                            <div class="chiplet">
                                 <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Closest transmitter</h2>
                                     <p style="font-size: 28px;font-weight: 300;" id="closest-station"></p>
                                     <p id="closest-station-details"></p>
                             </div>
                         </div>
 
-                        <div style="display: flex;">
-                            <div style="border-radius: 15px;padding: 10px;width: 50%;text-align: center;margin:5px;">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Stations by country</h3>
+                        <div class="flex-container">
+                            <div style="padding: 10px;text-align: center;" class="panel-50">
+                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by country</h3>
                                 <div style="height: 300px;">
                                     <canvas style="margin: auto;" id="ituDonutChart"></canvas>
                                 </div>
+                                <div style="display: flex;flex-wrap:wrap;justify-content: center;margin-top: 15px;" id="ituLegend"></div>
                             </div>
-                            <div style="border-radius: 15px;padding: 10px;width: 50%;text-align: center;margin:5px;">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Stations by genre</h3>
+                            <div style="padding: 10px;text-align: center;" class="panel-50">
+                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by genre</h3>
                                 <div style="height: 300px;">
                                     <canvas style="margin: auto;" id="ptyDonutChart"></canvas>
                                 </div>
+                                <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="ptyLegend"></div>
                             </div>
                         </div>
 
@@ -94,15 +96,15 @@
 
                 <% 
                     // Filter the data to only include items with both pi and ps
-                    const filteredData = data.filter(frequency => frequency.pi && frequency.ps);
+                    const filteredData = data.filter(frequency => frequency.pi.length === 4 && frequency.ps !== "");
                     const count = filteredData.length;
                 %>
                 <h2 style="text-align: center;margin-bottom: 25px;">Station list <span style="font-weight: 100"></span></h2>
                 <% data.forEach(frequency => { 
-                    if (frequency.pi && frequency.ps) { %> 
+                    if (frequency.pi.length === 4 && frequency.ps !== "") { %> 
                         <div class="station-panel-container" data-ant="<%= frequency.ant ? frequency.ant : 0 %>">
                             <div class="station-panel">
-                                <div class="station-panel-left">
+                                <div class="station-panel-left panel-25" style="text-align: center;">
                                     <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
                                     <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
                                 </div>
@@ -123,10 +125,15 @@
                                 </div>
                             </div>
                             <div class="station-panel-details" style="display: none;">
-                                <div style="display: flex;">
-                                    <div style="width: 75%;">
+                                <div class="flex-container">
+                                    <div class="panel-75">
                                         <span class="station-panel-ps" style="font-size: 30px;"><%= frequency.txInfo?.tx %></span>
-                                        <p style="margin: 0;"><strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', ' : '' %> <%= frequency.txInfo?.itu %></strong> <span class="text-light">(<%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km)</span></p>
+                                        <% if(frequency.txInfo.tx != "") { %>
+                                            <p style="margin: 0;">
+                                                <strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', ' : '' %> <%= frequency.txInfo?.itu %> </strong> • <%=frequency.txInfo?.erp + " kW (" +  frequency.txInfo.pol + ")"%> • 
+                                                <strong><%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km </strong>
+                                            </p>
+                                        <% } %>
                                         <p class="text-heading-light">AF</p>
                                         <p>
                                             <% frequency.af.sort(function(a, b) { return a - b; }).forEach(function(freq, index) { %>
@@ -140,8 +147,13 @@
                                             <%= frequency.rt1 %>
                                         </p>
                                     </div>
-                                    <div style="text-align: right;width:25%; position: relative;">
-                                        <img class="frequency-logo" data-src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" height="64"><br>
+                                    <div style="position: relative;" class="panel-25">
+                                        <img class="frequency-logo" 
+                                             data-src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" 
+                                             height="64" 
+                                             style="max-width: 230px;" 
+                                             onerror="handleImageError(this)">
+
                                         <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
                                             <img src="./img/map.png" style="position: absolute; right: 0; bottom: 0;" alt="Show on maps">
                                         </a>

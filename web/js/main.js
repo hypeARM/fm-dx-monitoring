@@ -265,3 +265,15 @@ function refreshCharts(antValue) {
             }
         });
     }
+
+    function handleImageError(img) {
+        // Try loading the SVG version of the image
+        const svgSrc = img.src.replace('.png', '.svg');
+        
+        // If the PNG fails, try the SVG. If it also fails, hide the image
+        img.onerror = function() {
+          img.style.display = 'none'; // Hide the image if both PNG and SVG fail
+        };
+        
+        img.src = svgSrc; // Set the image source to the SVG
+      }
