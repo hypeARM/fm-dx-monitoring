@@ -17,6 +17,8 @@ var colorsListBorder = [
     'rgb(245, 182, 66)',
     'rgb(250, 82, 141)',
     'rgb(128, 105, 250)',
+    'rgb(252, 186, 3)',
+    'rgb(100, 200, 255)'
 ]
 
 var colorsListBg = [
@@ -27,6 +29,9 @@ var colorsListBg = [
     'rgba(245, 182, 66, 0.4)',
     'rgba(250, 82, 141, 0.4)',
     'rgba(128, 105, 250, 0.4)',
+    'rgba(252, 186, 3, 0.4)',
+    'rgba(100, 200, 255)'
+
 ]
 
 // Fetch the data once and store it in cachedData
@@ -57,7 +62,11 @@ function preparePanelData(filteredData) {
     let stationsWithPiAndPs = filteredData.filter(station => 
         station.pi.length === 4 && station.ps !== ""
     ).length;
-    $("#total-stations").text(stationsWithPiAndPs);
+    let stereoStationsWithoutRds = filteredData.filter(station => 
+        station.pi.length !== 4 && station.st === true
+    ).length;
+    $("#total-stations").text(stationsWithPiAndPs + stereoStationsWithoutRds);
+    $("#total-stations-rds").text(stationsWithPiAndPs);
 
     // Ensure we get the valid station for the highest distance
     let highestDistance = filteredData
@@ -250,21 +259,18 @@ function preparePolChart(filteredData) {
 
     // Force canvas resize before redrawing the chart
     const canvas = document.getElementById('polBarChart');
-    canvas.width = canvas.parentElement.offsetWidth;  // Reset canvas width to match parent width
-    canvas.height = canvas.parentElement.offsetHeight; // Reset canvas height to match parent height
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
 
     const polMap = new Map();
-    const polTypes = ['V', 'H', 'M', 'C'];  // Define the possible values for pol
+    const polTypes = ['V', 'H', 'M', 'C'];
 
-    // Initialize the map with 0 values for each type
     polTypes.forEach(type => {
         polMap.set(type, 0);
     });
 
-    // Iterate over each item in the filteredData array
     filteredData.forEach(item => {
         const polData = item.txInfo && item.txInfo?.pol;
-
         if (polData && item.rds === true) {
             if (polMap.has(polData)) {
                 polMap.set(polData, polMap.get(polData) + 1);
@@ -272,47 +278,78 @@ function preparePolChart(filteredData) {
         }
     });
 
+    const total = Array.from(polMap.values()).reduce((sum, count) => sum + count, 0);
+
     const chartData = {
-        labels: [''],
+        labels: [''], // Single label for the entire bar
         datasets: polTypes.map((type, index) => {
             const count = polMap.get(type);
+            const percentage = ((count / total) * 100).toFixed(2);
             return {
-                label: getFullLabel(type),
-                data: [count],
+                label: getFullLabel(type), // Just the label name here
+                data: [percentage], // Percentage for the stacked bar
                 backgroundColor: colorsListBg[index],
                 borderColor: colorsListBorder[index],
                 borderWidth: 3
             };
         })
-    };    
+    };
 
     window.polChart = new Chart(ctx, {
         type: 'bar',
         data: chartData,
         options: {
             responsive: true,
-            indexAxis: 'y', // Horizontal bars
+            indexAxis: 'y',
             plugins: {
                 legend: {
-                    position: 'top',
+                    display: false, // Show the legend with just the label name
                 },
-                title: {
-                    display: false,
-                    text: 'Polarity Distribution per Antenna'
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const dataset = context.dataset;
+                            const count = polMap.get(polTypes[context.dataIndex]);
+                            const percentage = ((count / total) * 100).toFixed(2);
+                            return `${dataset.label}: ${percentage}% (${count})`; // Tooltip shows "Label: Percentage (Count)"
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
-                    beginAtZero: true,  // Ensure bars start from zero
-                    stacked: true,      // Stack the bars within the same bar
+                    beginAtZero: true,
+                    stacked: true,
+                    max: 100,  // Set the max value of the x-axis to 100 to represent percentage
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';  // Show percentages on the x-axis
+                        }
+                    }
                 },
                 y: {
-                    stacked: true,      // Stack vertically to combine all values in one bar
+                    stacked: true
                 }
             }
         }
     });
+
+    const legendHtml = chartData.datasets.map((dataset, index) => {
+        const percentage = dataset.data[0]; // Percentage is the first value in the `data` array
+        const count = polMap.get(polTypes[index]); // Get the count for each category
+    
+        return `
+            <div style="display: flex; align-items: center; margin: 5px;">
+                <span style="width: 12px; height: 12px; background-color: ${dataset.backgroundColor}; border: 2px solid ${dataset.borderColor}; margin-right: 8px;"></span>
+                <span>${dataset.label} <span style="opacity: 0.7">(${parseFloat(percentage).toFixed(0)}% - ${count})</span></span>
+            </div>
+        `;
+    }).join('');    
+    
+    document.getElementById('polLegend').innerHTML = legendHtml;
 }
+
+
 
 // Function to map short strings to full labels
 function getFullLabel(type) {

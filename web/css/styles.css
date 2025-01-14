@@ -83,10 +83,11 @@ h2, h4, p {
 
 .station-panel-container .station-panel-more img, .chart-panel-more img {
     transition: transform 0.3s ease; /* Smooth rotation */
+    transform: rotate(90deg);
 }
 
 .station-panel-container.active .station-panel-more img, .chart-panel-more.active img {
-    transform: rotate(180deg);
+    transform: rotate(270deg);
 }
 
 .station-panel:not(.chart-panel), .chart-panel-more {
@@ -111,6 +112,10 @@ h2, h4, p {
     text-align: center;
     min-width: 200px;
     padding: 0 25px;
+}
+
+.station-panel-center {
+    user-select: none;
 }
 
 .station-panel-ps {

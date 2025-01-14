@@ -1,8 +1,6 @@
-
+var antValue = 0;
 
 $(document).ready(function() {
-    var antValue = 0;
-
     initPanels();
     checkImageFormat();
     loadPanels(antValue);
@@ -25,6 +23,15 @@ $(document).ready(function() {
     if ($('[id^="ant-"].active').length === 0) {
         generateChart(filterDataByAntenna(0));
     }
+
+    $('#signal-chart').on('click', function(evt) {
+        const points = window.myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
+        if (points.length) {
+            const firstPoint = points[0];
+            const freq = window.myChart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
+            handleChartClick(freq);
+        }
+    });
 });
 
 
@@ -265,6 +272,19 @@ function refreshCharts(antValue) {
             }
         });
     }
+
+    function handleChartClick(freq) {
+        const $panel = $(`.station-panel-container[data-ant='${antValue}'] .station-panel[data-freq='${freq}']`);
+    
+        if ($panel.length) {
+            $('html, body').animate({
+                scrollTop: $panel.offset().top - ($(window).height() / 2) + ($panel.outerHeight() / 2)
+            }, 300);
+    
+            $panel.click();
+        }
+    }
+    
 
     function handleImageError(img) {
         // Try loading the SVG version of the image

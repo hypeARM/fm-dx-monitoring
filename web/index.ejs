@@ -44,8 +44,8 @@
                     <div class="signal-chart-container" style="height: 350px;padding: 20px;">
                         <canvas id="signal-chart"></canvas>
                     </div>
-                    <div class="chart-panel-more" style="text-align: center">
-                        <img src="./img/arrow.svg" width="64">
+                    <div class="chart-panel-more" style="display: flex;align-items: center;justify-content: center;padding: 10px;">
+                        <img src="./img/arrow.svg" width="24">
                     </div>
                     <div class="station-panel-details chart-panel-details" style="display: none;">
                         <div style="width: 100%;text-align: center;">
@@ -55,6 +55,7 @@
                             <div class="chiplet">
                                 <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Total stations</h2>
                                     <p style="font-size: 28px;font-weight: 300;" id="total-stations"></p>
+                                    <p><strong id="total-stations-rds"></strong> with RDS</p>
                             </div>
                             <div class="chiplet">
                                 <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Most distant transmitter</h2>
@@ -90,6 +91,7 @@
                             <div style="height: 150px;width: 100%; position: relative;">
                                 <canvas id="polBarChart" style="margin: auto;width: 100%; height: 100%;"></canvas>
                             </div>
+                            <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="polLegend"></div>
                         </div>
                     </div>
                 </div>
@@ -103,7 +105,7 @@
                 <% data.forEach(frequency => { 
                     if (frequency.pi.length === 4 && frequency.ps !== "") { %> 
                         <div class="station-panel-container" data-ant="<%= frequency.ant ? frequency.ant : 0 %>">
-                            <div class="station-panel">
+                            <div class="station-panel" data-freq="<%= frequency.freq %>">
                                 <div class="station-panel-left panel-25" style="text-align: center;">
                                     <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
                                     <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
@@ -120,8 +122,8 @@
                                         <%= frequency.pty %>
                                     </strong>
                                 </div>
-                                <div class="station-panel-more" style="width: 15%;text-align: center">
-                                    <img src="./img/arrow.svg" width="64">
+                                <div class="station-panel-more" style="width: 15%;display: flex;align-items: center;justify-content: center;">
+                                    <img src="./img/arrow.svg" width="24">
                                 </div>
                             </div>
                             <div class="station-panel-details" style="display: none;">
@@ -151,7 +153,7 @@
                                         <img class="frequency-logo" 
                                              data-src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" 
                                              height="64" 
-                                             style="max-width: 230px;" 
+                                             style="max-width: 230px;object-fit: contain;" 
                                              onerror="handleImageError(this)">
 
                                         <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
