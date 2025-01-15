@@ -5,11 +5,17 @@ const fs = require('fs');
 const app = express();
 
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config.json')));
+const readline = require('readline');
 
 let frequencyData = [];
 let localStorageInfo = [];
 var isRunning = false;
 const dataFilePath = path.join(__dirname, 'frequencyData.json');
+
+const terminalWidth = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  }).output.columns;
 
 const europe_programmes = [
     "No PTY", "News", "Current Affairs", "Info",
@@ -21,19 +27,22 @@ const europe_programmes = [
     "Oldies Music", "Folk Music", "Documentary", "Alarm Test"
 ];
 
+
 console.log(`
     \x1b[32m.  .        ,              
-    \x1b[34m|\/| _ ._ *-+- _ ._.*._  _ 
-    \x1b[33m|  |(_)[ )| | (_)[  |[ )(_]
-    \x1b[35m                        ._|
-    \x1b[0mby Noobish @ FMDX.org
+    \x1b[32m|\\/| _ ._ *-+- _ ._.*._  _ 
+    \x1b[32m|  |(_)[ )| | (_)[  |[ )(_]
+    \x1b[32m                        ._|
+    \x1b[2mby Noobish @ \x1b[4mFMDX.org\x1b[0m
 `);
-
+  
+console.log('\x1b[90m' + '─'.repeat(terminalWidth - 1) + '\x1b[0m');
+  
 try {
     if (fs.existsSync(dataFilePath)) {
         const data = fs.readFileSync(dataFilePath, 'utf8');
         frequencyData = JSON.parse(data);
-        console.log('[INFO] Loaded frequency data from file:', dataFilePath);
+        console.log('[INFO] Loaded frequency data from file:\x1b[4m\x1b[36m', dataFilePath + '\x1b[0m');
     }
 } catch (error) {
     console.error('Error reading frequency data file:', error);
@@ -41,7 +50,7 @@ try {
 
 async function fetchIPData() {
     try {
-        const response = await axios.get(config.webserverLink + '/api');
+        const response = await axios.get(config.webserverLink + '/api', { timeout: 4000 });
         const ipData = response.data;
         const pty = ipData.pty;
         const ptyString = europe_programmes[pty] || 'Unknown';
@@ -115,7 +124,6 @@ async function fetchLocalStorageData() {
     }
 }
 
-
 fetchLocalStorageData();
 
 app.set('view engine', 'ejs');
@@ -137,5 +145,5 @@ endpoints.get('/data', (req, res) => {
 
 app.use('/', endpoints);
 app.listen(config.monitoringPort, () => {
-    console.log(`[INFO] Server is running on http://localhost:${config.monitoringPort}`);
+    console.log(`[INFO] Server is running on \x1b[4m\x1b[36mhttp://localhost:${config.monitoringPort}\x1b[0m`);
 });

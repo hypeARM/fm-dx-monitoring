@@ -1,12 +1,3 @@
-/* Info that is supposed to be there per antenna:
-PTY donut chart  - ok
-most distant reception - ok
-closest reception 
-how many stations use stereo/mono (horizontal bar graph)
-total stations with RDS - ok
-country donut chart - ok
-*/
-
 var antValue;
 let cachedData = null; // Variable to store the fetched data
 var colorsListBorder = [
@@ -18,7 +9,8 @@ var colorsListBorder = [
     'rgb(250, 82, 141)',
     'rgb(128, 105, 250)',
     'rgb(252, 186, 3)',
-    'rgb(100, 200, 255)'
+    'rgb(100, 200, 255)',
+    'rgb(150, 180, 230)',
 ]
 
 var colorsListBg = [
@@ -30,8 +22,8 @@ var colorsListBg = [
     'rgba(250, 82, 141, 0.4)',
     'rgba(128, 105, 250, 0.4)',
     'rgba(252, 186, 3, 0.4)',
-    'rgba(100, 200, 255)'
-
+    'rgba(100, 200, 255, 0.4)',
+    'rgba(150, 180, 230, 0.4)'
 ]
 
 // Fetch the data once and store it in cachedData
@@ -309,12 +301,14 @@ function preparePolChart(filteredData) {
                     callbacks: {
                         label: function(context) {
                             const dataset = context.dataset;
-                            const count = polMap.get(polTypes[context.dataIndex]);
+                            const index = context.dataIndex; // The index of the current hovered item in the dataset
+                            const count = polMap.get(polTypes[context.datasetIndex]); // Get the count for the corresponding pol type
                             const percentage = ((count / total) * 100).toFixed(2);
-                            return `${dataset.label}: ${percentage}% (${count})`; // Tooltip shows "Label: Percentage (Count)"
+                            return `${dataset.label}: ${percentage}% (${count})`; // Only show the relevant dataset information
                         }
                     }
                 }
+                
             },
             scales: {
                 x: {
@@ -349,9 +343,6 @@ function preparePolChart(filteredData) {
     document.getElementById('polLegend').innerHTML = legendHtml;
 }
 
-
-
-// Function to map short strings to full labels
 function getFullLabel(type) {
     switch(type) {
         case 'V': return 'Vertical';
@@ -360,9 +351,4 @@ function getFullLabel(type) {
         case 'C': return 'Circular';
         default: return type;
     }
-}
-
-function rgbToRgba(rgb, opacity) {
-    let rgbValues = rgb.match(/\d+/g); // Extract the numeric values
-    return `rgba(${rgbValues[0]}, ${rgbValues[1]}, ${rgbValues[2]}, ${opacity})`;
 }
