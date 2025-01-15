@@ -38,7 +38,7 @@ Join our **Discord community** to get the latest development update info, share 
    ```bash
    node .
    ```
-5. Open your web browser and navigate to `http:/localhost:8080` to access the web interface.
+5. Open your web browser and navigate to `http:/localhost:3000` to access the web interface.
 
 ## Getting Started (Linux)
 
