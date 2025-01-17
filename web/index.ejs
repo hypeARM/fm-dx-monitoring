@@ -1,192 +1,188 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link href="./css/styles.css" rel="stylesheet" type="text/css">
-        <script
-        src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
-  
-        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./css/styles.css" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <title>FM-DX Monitoring - <%= info.tunerName %></title>
+</head>
+<body style="background-image: url('<%= info.bgImage ? info.bgImage : '' %>')">
+    <div id="wrapper-outer">
+        <div class="wrapper">
+            <h1 style="text-align: center; margin-top: 0;padding-top: 25px;font-weight: 100;color: var(--color-main-bright);">FM-DX Monitoring</h1>
+            <h2 style="text-align: center;"><span style="font-weight: 100">Connected to </span> <%= info.tunerName %></h2>
+            <h4 style="text-align: center; font-weight: 100; margin-bottom: 20px;color: var(--color-5)">Powered by FM-DX Webserver</h4>
 
-        <title>FM-DX Monitoring - <%= info.tunerName %></title>
-    </head>
-    <body style="background-image: url('<%= info.bgImage ? info.bgImage : null %>')">
-        <div id="wrapper-outer">
-            <div class="wrapper">
-                <h1 style="text-align: center; margin-top: 0;padding-top: 25px;font-weight: 100;color: var(--color-main-bright);">FM-DX Monitoring</h1>
-                <h2 style="text-align: center;"><span style="font-weight: 100">Connected to </span> <%= info.tunerName %></h2>
-                <h4 style="text-align: center; font-weight: 100; margin-bottom: 20px;color: var(--color-5)">Powered by FM-DX Webserver</h4>
+            <div class="chart-panel station-panel" style="margin-bottom: 25px;display: block;padding: 0;">
 
-                <div class="chart-panel station-panel" style="margin-bottom: 25px;display: block;padding: 0;">
-
-                    <% if (info.ant?.enabled) { %>
-                        <div style="display: flex; text-align: center; border-radius: 15px 15px 0 0; overflow: hidden;">
-                            <% if (info.ant.ant1.enabled) { %>
-                                <div class="antenna-button active" id="ant-0"><%= info.ant.ant1.name %></div>
-                            <% } %>
-                            <% if (info.ant.ant2.enabled) { %>
-                                <div class="antenna-button" id="ant-1"><%= info.ant.ant2.name %></div>
-                            <% } %>
-                            <% if (info.ant.ant3.enabled) { %>
-                                <div class="antenna-button" id="ant-2"><%= info.ant.ant3.name %></div>
-                            <% } %>
-                            <% if (info.ant.ant4.enabled) { %>
-                                <div class="antenna-button" id="ant-3"><%= info.ant.ant4.name %></div>
-                            <% } %>
-                        </div>
-                    <% } %>                    
- 
-                    <div class="signal-chart-container" style="height: 350px;padding: 20px;">
-                        <canvas id="signal-chart"></canvas>
+                <% if (info.ant?.enabled) { %>
+                    <div style="display: flex; text-align: center; border-radius: 15px 15px 0 0; overflow: hidden;">
+                        <% if (info.ant.ant1.enabled) { %>
+                            <div class="antenna-button active" id="ant-0"><%= info.ant.ant1.name %></div>
+                        <% } %>
+                        <% if (info.ant.ant2.enabled) { %>
+                            <div class="antenna-button" id="ant-1"><%= info.ant.ant2.name %></div>
+                        <% } %>
+                        <% if (info.ant.ant3.enabled) { %>
+                            <div class="antenna-button" id="ant-2"><%= info.ant.ant3.name %></div>
+                        <% } %>
+                        <% if (info.ant.ant4.enabled) { %>
+                            <div class="antenna-button" id="ant-3"><%= info.ant.ant4.name %></div>
+                        <% } %>
                     </div>
-                    <div class="chart-panel-more" style="display: flex;align-items: center;justify-content: center;padding: 10px;">
-                        <img src="./img/arrow.svg" width="24">
+                <% } %>                    
+     
+                <div class="signal-chart-container" style="height: 350px;padding: 20px;">
+                    <canvas id="signal-chart"></canvas>
+                </div>
+                <div class="chart-panel-more" style="display: flex;align-items: center;justify-content: center;padding: 10px;">
+                    <img src="./img/arrow.svg" width="24">
+                </div>
+                <div class="station-panel-details chart-panel-details" style="display: none;">
+                    <div style="width: 100%;text-align: center;">
+                        <h2 style="font-weight: 300; color: var(--color-main-bright);font-size: 38px;">Statistics</h2>
                     </div>
-                    <div class="station-panel-details chart-panel-details" style="display: none;">
-                        <div style="width: 100%;text-align: center;">
-                            <h2 style="font-weight: 300; color: var(--color-main-bright);font-size: 38px;">Statistics</h2>
+                    <div class="flex-container">
+                        <div class="chiplet">
+                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Total stations</h3>
+                            <p style="font-size: 28px;font-weight: 300;" id="total-stations"></p>
+                            <p><strong id="total-stations-rds"></strong> with RDS</p>
                         </div>
-                        <div class="flex-container">
-                            <div class="chiplet">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Total stations</h2>
-                                    <p style="font-size: 28px;font-weight: 300;" id="total-stations"></p>
-                                    <p><strong id="total-stations-rds"></strong> with RDS</p>
-                            </div>
-                            <div class="chiplet">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Most distant transmitter</h2>
-                                    <p style="font-size: 28px;font-weight: 300;" id="distant-station"></p>
-                                    <p id="distant-station-details"></p>
-                            </div>
-                            <div class="chiplet">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Closest transmitter</h2>
-                                    <p style="font-size: 28px;font-weight: 300;" id="closest-station"></p>
-                                    <p id="closest-station-details"></p>
-                            </div>
+                        <div class="chiplet">
+                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Most distant transmitter</h3>
+                            <p style="font-size: 28px;font-weight: 300;" id="distant-station"></p>
+                            <p id="distant-station-details"></p>
                         </div>
+                        <div class="chiplet">
+                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Closest transmitter</h3>
+                            <p style="font-size: 28px;font-weight: 300;" id="closest-station"></p>
+                            <p id="closest-station-details"></p>
+                        </div>
+                    </div>
 
-                        <div class="flex-container">
-                            <div style="padding: 10px;text-align: center;" class="panel-50">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by country</h3>
-                                <div style="height: 300px;">
-                                    <canvas style="margin: auto;" id="ituDonutChart"></canvas>
-                                </div>
-                                <div style="display: flex;flex-wrap:wrap;justify-content: center;margin-top: 15px;" id="ituLegend"></div>
+                    <div class="flex-container">
+                        <div style="padding: 10px;text-align: center;" class="panel-50">
+                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by country</h3>
+                            <div style="height: 300px;">
+                                <canvas style="margin: auto;" id="ituDonutChart"></canvas>
                             </div>
-                            <div style="padding: 10px;text-align: center;" class="panel-50">
-                                <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by genre</h3>
-                                <div style="height: 300px;">
-                                    <canvas style="margin: auto;" id="ptyDonutChart"></canvas>
-                                </div>
-                                <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="ptyLegend"></div>
-                            </div>
+                            <div style="display: flex;flex-wrap:wrap;justify-content: center;margin-top: 15px;" id="ituLegend"></div>
                         </div>
+                        <div style="padding: 10px;text-align: center;" class="panel-50">
+                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;">Stations by genre</h3>
+                            <div style="height: 300px;">
+                                <canvas style="margin: auto;" id="ptyDonutChart"></canvas>
+                            </div>
+                            <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="ptyLegend"></div>
+                        </div>
+                    </div>
 
-                        <div style="width: 100%;text-align: center;">
-                            <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Polarization distribution</h3>
-                            <div style="height: 150px;width: 100%; position: relative;">
-                                <canvas id="polBarChart" style="margin: auto;width: 100%; height: 100%;"></canvas>
-                            </div>
-                            <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="polLegend"></div>
+                    <div style="width: 100%;text-align: center;">
+                        <h3 style="font-weight: 300; color: var(--color-main-bright);font-size: 32px;margin: 0;">Polarization distribution</h3>
+                        <div style="height: 150px;width: 100%; position: relative;">
+                            <canvas id="polBarChart" style="margin: auto;width: 100%; height: 100%;"></canvas>
                         </div>
+                        <div style="display: flex;flex-wrap: wrap;justify-content: center;margin-top: 15px;" id="polLegend"></div>
                     </div>
                 </div>
+            </div>
 
-                <% 
-                    // Filter the data to only include items with both pi and ps
-                    const filteredData = data.filter(frequency => frequency.pi.length === 4 && frequency.ps !== "");
-                    const count = filteredData.length;
-                %>
-                <h2 style="text-align: center;margin-bottom: 25px;">Station list <span style="font-weight: 100"></span></h2>
-                <% data.forEach(frequency => { 
-                    if (frequency.pi.length === 4 && frequency.ps !== "") { %> 
-                        <div class="station-panel-container" data-ant="<%= frequency.ant ? frequency.ant : 0 %>">
-                            <div class="station-panel" data-freq="<%= frequency.freq %>">
-                                <div class="station-panel-left panel-25" style="text-align: center;">
-                                    <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
-                                    <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
-                                </div>
-                                <div class="station-panel-center" style="width: 50%;">
-                                    <span style="font-size: 14px;" class="color-4">Date: </span> <span style="font-size: 14px;color: var(--color-3)"><%= frequency.date %></span><br>
-                                    <span style="font-weight: 700;" class="color-4"><%= (frequency.sig - 11.25).toFixed(0) %> dBμV</span>
-                                    <span class="hide-phone" style="margin-left: 25px;"><%= frequency.rt0 == "" ? frequency.rt1 : frequency.rt0  %></span>
-                                </div>
-                                <div class="station-panel-right" style="width: 30%;padding-left: 20px;padding-right: 20px;">
-                                    <table id="rds-flags">
-                                        <tr style="font-size: 20px;;">
-                                            <td style="font-weight: 700;"><%- frequency.tp == 1 ? 'TP' : '<span style="opacity:0.3">TP</span>' %></td>
-                                            <td>
-                                                <div class="circle-container">
-                                                    <div class="circle data-st circle1 <%= frequency.st == 1 ? 'color-4' : 'color-3' %>" style="left: 0px;"></div>
-                                                    <div class="circle data-st circle2 <%= frequency.st == 1 ? 'color-4' : 'color-3' %>" style="display: block;"></div>
-                                                </div>
-                                            </td>
-                                            <td><%- frequency.pty == "No PTY" ? "<span style='opacity: 0.5;'>No PTY</span>" : frequency.pty %></td>
-                                        </tr>    
-                                    </table>
-                                </div>
-                                <div class="station-panel-more" style="width: 150px;display: flex;align-items: center;justify-content: center;">
-                                    <img src="./img/arrow.svg" width="24">
-                                </div>
+            <% 
+                // Filter the data to only include items with both pi and ps
+                const filteredData = data.filter(frequency => frequency.pi.length === 4 && frequency.ps !== "");
+                const count = filteredData.length;
+            %>
+            <h2 style="text-align: center;margin-bottom: 25px;">Station list</h2>
+            <% data.forEach(frequency => { 
+                if (frequency.pi.length === 4 && frequency.ps !== "") { %> 
+                    <div class="station-panel-container" data-ant="<%= frequency.ant ? frequency.ant : 0 %>">
+                        <div class="station-panel" data-freq="<%= frequency.freq %>">
+                            <div class="station-panel-left panel-25" style="text-align: center;">
+                                <strong><%= frequency.freq %> MHz</strong> <span style="color: #999;">• </span> <%= frequency.pi %><br>
+                                <span class="station-panel-ps"><%= frequency.ps ? frequency.ps : '.' %></span>
                             </div>
-                            <div class="station-panel-details" style="display: none;">
-                                <div class="flex-container">
-                                    <div class="panel-75">
-                                        <span class="station-panel-ps" style="font-size: 30px;"><%= frequency.txInfo?.tx %></span>
-                                        <% if(frequency.txInfo.tx != "") { %>
-                                            <p style="margin: 0;">
-                                                <strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', ' : '' %> <%= frequency.txInfo?.itu %> </strong> • <%=frequency.txInfo?.erp + " kW (" +  frequency.txInfo.pol + ")"%> • 
-                                                <strong><%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km </strong>
-                                            </p>
-                                        <% } %>
-                                        <p class="text-heading-light">AF</p>
-                                        <p>
-                                            <% frequency.af.sort(function(a, b) { return a - b; }).forEach(function(freq, index) { %>
-                                                <%= (freq / 1000).toFixed(1) %><% if (index < frequency.af.length - 1) { %> • <% } %>
-                                            <% }); %>
+                            <div class="station-panel-center" style="width: 50%;">
+                                <span style="font-size: 14px;" class="color-4">Date: </span> <span style="font-size: 14px;color: var(--color-3)"><%= frequency.date %></span><br>
+                                <span style="font-weight: 700;" class="color-4"><%= (frequency.sig - 11.25).toFixed(0) %> dBμV</span>
+                                <span class="hide-phone" style="margin-left: 25px;"><%= frequency.rt0 == "" ? frequency.rt1 : frequency.rt0  %></span>
+                            </div>
+                            <div class="station-panel-right" style="width: 30%;padding-left: 20px;padding-right: 20px;">
+                                <table id="rds-flags">
+                                    <tr style="font-size: 20px;">
+                                        <td style="font-weight: 700;"><%- frequency.tp == 1 ? 'TP' : '<span style="opacity:0.3">TP</span>' %></td>
+                                        <td>
+                                            <div class="circle-container">
+                                                <div class="circle data-st circle1 <%= frequency.st == 1 ? 'color-4' : 'color-3' %>" style="left: 0px;"></div>
+                                                <div class="circle data-st circle2 <%= frequency.st == 1 ? 'color-4' : 'color-3' %>" style="display: block;"></div>
+                                            </div>
+                                        </td>
+                                        <td><%- frequency.pty == "No PTY" ? "<span style='opacity: 0.5;'>No PTY</span>" : frequency.pty %></td>
+                                    </tr>    
+                                </table>
+                            </div>
+                            <div class="station-panel-more" style="width: 150px;display: flex;align-items: center;justify-content: center;">
+                                <img src="./img/arrow.svg" width="24">
+                            </div>
+                        </div>
+                        <div class="station-panel-details" style="display: none;">
+                            <div class="flex-container">
+                                <div class="panel-75">
+                                    <span class="station-panel-ps" style="font-size: 30px;"><%= frequency.txInfo?.tx %></span>
+                                    <% if(frequency.txInfo.tx != "") { %>
+                                        <p style="margin: 0;">
+                                            <strong><%= frequency.txInfo?.city ? frequency.txInfo.city + ', ' : '' %> <%= frequency.txInfo?.itu %> </strong> • <%=frequency.txInfo?.erp + " kW (" +  frequency.txInfo.pol + ")"%> • 
+                                            <strong><%= frequency.txInfo?.dist ? frequency.txInfo.dist : '? ' %> km </strong>
                                         </p>
+                                    <% } %>
+                                    <p class="text-heading-light">AF</p>
+                                    <p>
+                                        <% frequency.af.sort(function(a, b) { return a - b; }).forEach(function(freq, index) { %>
+                                            <%= (freq / 1000).toFixed(1) %><% if (index < frequency.af.length - 1) { %> • <% } %>
+                                        <% }); %>
+                                    </p>
 
-                                        <p class="text-heading-light">Radiotext</p>
-                                        <p>
-                                            <%= frequency.rt0 %><br>
-                                            <%= frequency.rt1 %>
-                                        </p>
-                                    </div>
-                                    <div style="position: relative;" class="panel-25">
-                                        <img class="frequency-logo" 
-                                             data-src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" 
-                                             height="64" 
-                                             style="max-width: 230px;object-fit: contain;" 
-                                             onerror="handleImageError(this)">
+                                    <p class="text-heading-light">Radiotext</p>
+                                    <p>
+                                        <%= frequency.rt0 %><br>
+                                        <%= frequency.rt1 %>
+                                    </p>
+                                </div>
+                                <div style="position: relative;" class="panel-25">
+                                    <img class="frequency-logo" 
+                                        data-src="https://tef.noobish.eu/logos/<%= frequency.txInfo?.itu %>/<%= frequency.pi %>.png" 
+                                        height="64" 
+                                        style="max-width: 230px;object-fit: contain;" 
+                                        onerror="handleImageError(this)">
 
-                                        <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
-                                            <img src="./img/map.png" style="position: absolute; right: 0; bottom: 0;" alt="Show on maps">
-                                        </a>
-                                    </div>
+                                    <a href="https://maps.fmdx.org/#qth=<%= info.qthLatitude %>,<%= info.qthLongitude %>&freq=<%= frequency.freq %>&findPi=<%= frequency.pi %>" target="_blank">
+                                        <img src="./img/map.png" style="position: absolute; right: 0; bottom: 0;" alt="Show on maps">
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    <% } 
-                }) %>                
-            </div>
-            <footer>
-                <ul>
-                    <li><a href="https://servers.fmdx.org" target="_blank">Server list</a></li>
-                    <li><a href="https://github.com/noobishsvk/fm-dx-monitoring" target="_blank">Source code</a></li>
-                    <li><a href="https://discord.gg/ZAVNdS74mC" target="_blank">Community</a></li>
-                    <li><a href="https://buymeacoffee/fmdx" target="_blank">Support the project</a></li>    
-                </ul>
-                <p style="opacity: 0.7; font-size: 14px;">
-                    Transmitter identification data by <a href="https://fmlist.org" target="_blank">FMLIST.org</a> • FM-DX Monitoring &copy; <a href="https://fmdx.org" target="_blank">FMDX.org</a>
-                </p>
-                </footer>
+                    </div>
+                <% } 
+            }) %>                
         </div>
-        <script src="./js/dashboard.js"></script>
-        <script src="./js/main.js"></script>
+        <footer>
+            <ul>
+                <li><a href="https://servers.fmdx.org" target="_blank">Server list</a></li>
+                <li><a href="https://github.com/noobishsvk/fm-dx-monitoring" target="_blank">Source code</a></li>
+                <li><a href="https://discord.gg/ZAVNdS74mC" target="_blank">Community</a></li>
+                <li><a href="https://buymeacoffee/fmdx" target="_blank">Support the project</a></li>    
+            </ul>
+            <p style="opacity: 0.7; font-size: 14px;">
+                Transmitter identification data by <a href="https://fmlist.org" target="_blank">FMLIST.org</a> • FM-DX Monitoring &copy; <a href="https://fmdx.org" target="_blank">FMDX.org</a>
+            </p>
+        </footer>
+    </div>
+    <script src="./js/dashboard.js"></script>
+    <script src="./js/main.js"></script>
 
-    </body>
+</body>
 </html>
